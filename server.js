@@ -5,7 +5,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.sendFile('index.html', {
     root: __dirname
   });
@@ -42,8 +42,22 @@ const searchResults = [
 // 1. Starts with query.
 // 2. Any word starts with query.
 // 3. Any word starts with all space-separated query.
-app.post('/search', function(req, res) {
-  return res.json([]);
-});
+app.post('/search', function (req, res) {
+  return res.json(searchResults.filter(word => {
+    let wordArr = word.split(' ');
+    let searchTerms = req.body.searchTerm.toLowerCase().split(' ');
+
+    let res = true;
+    for (let elem of searchTerms) {
+      res = res && wordArr.some(w => {
+        let newW = w.toLowerCase();
+        return newW.startsWith(elem);
+      });
+    }
+    return res;
+
+  }))
+}
+);
 
 app.listen(process.env.PORT || 3000);
